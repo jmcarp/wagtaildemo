@@ -6,9 +6,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from wagtail.wagtailcore.models import Page, Orderable
-from wagtail.wagtailcore.fields import RichTextField
+from wagtail.wagtailcore.fields import RichTextField, StreamField
+from wagtail.wagtailcore import blocks
+from wagtail.wagtailimages.blocks import ImageChooserBlock
 from wagtail.wagtailadmin.edit_handlers import FieldPanel, MultiFieldPanel, \
-    InlinePanel, PageChooserPanel
+    InlinePanel, PageChooserPanel, StreamFieldPanel
 from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtail.wagtailimages.models import Image
 from wagtail.wagtaildocs.edit_handlers import DocumentChooserPanel
@@ -229,6 +231,11 @@ class StandardPageRelatedLink(Orderable, RelatedLink):
 class StandardPage(Page):
     intro = RichTextField(blank=True)
     body = RichTextField(blank=True)
+    stream = StreamField([
+        ('heading', blocks.CharBlock(classname="full title")),
+        ('paragraph', blocks.RichTextBlock()),
+        ('image', ImageChooserBlock()),
+    ])
     feed_image = models.ForeignKey(
         'wagtailimages.Image',
         null=True,
@@ -247,6 +254,7 @@ StandardPage.content_panels = [
     FieldPanel('intro', classname="full"),
     InlinePanel(StandardPage, 'carousel_items', label="Carousel items"),
     FieldPanel('body', classname="full"),
+    StreamFieldPanel('stream'),
     InlinePanel(StandardPage, 'related_links', label="Related links"),
 ]
 
